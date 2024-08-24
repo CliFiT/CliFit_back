@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: weather-app
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa: # ORM
+    database: mysql
+    show-sql: true
+
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
+jwt:
+  header: Auth
+  secret: ${JWT_SECRET}
+
+weather:
+  api:
+    url: ${WEATHER_URL}
+    authKey: ${AUTH_KEY}
