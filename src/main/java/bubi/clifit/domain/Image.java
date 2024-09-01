@@ -23,6 +23,8 @@ public class Image {
     private double minTemperature;
     private double maxTemperature;
 
+    private String contentType;
+
     @Lob
     @Column(name = "data", columnDefinition = "LONGBLOB")
     private byte[] data;

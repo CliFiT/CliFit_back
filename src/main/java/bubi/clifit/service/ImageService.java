@@ -26,6 +26,7 @@ public class ImageService {
         image.setWeather(weather);
         image.setMinTemperature(minTemperature);
         image.setMaxTemperature(maxTemperature);
+        image.setContentType(file.getContentType());
         image.setData(file.getBytes());
 
         //이미지 관련 정보 설정

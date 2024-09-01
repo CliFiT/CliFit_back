@@ -23,19 +23,29 @@ public class OpenAiService {
         headers.set("Authorization", "Bearer " + openAiApiKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String requestBody = String.format("{\"prompt\": \"%s\"}", prompt);
+        // 요청 본문 생성 (JSON 형식)
+        String requestBody = String.format(
+                "{\"model\": \"gpt-4\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}], \"max_tokens\": 150}",
+                prompt
+        );
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                "https://api.openai.com/v1/completions",
-                HttpMethod.POST,
-                entity,
-                String.class);
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to get recommendation from OpenAI API");
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://api.openai.com/v1/chat/completions",
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return response.getBody();
+            } else {
+                throw new RuntimeException("Failed to get recommendation from OpenAI API: " + response.getStatusCode());
+            }
+        } catch (RestClientException e) {
+            throw new RuntimeException("Error while calling OpenAI API: " + e.getMessage(), e);
         }
     }
 }

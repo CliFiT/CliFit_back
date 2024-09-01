@@ -48,6 +48,7 @@ public class ImageController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
+                    .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
                     .body(image.getData());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

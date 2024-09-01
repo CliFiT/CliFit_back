@@ -55,8 +55,9 @@ public class WeatherService {
             if (xmlResponse == null) {
                 throw new RuntimeException("API response is null");
             }
-
-            return parseXmlToWeatherResponse(xmlResponse);
+            WeatherResponse response = parseXmlToWeatherResponse(xmlResponse);
+            response.setSeason(determineSeason(LocalDate.now()));
+            return response;
 
         } catch (RestClientException e) {
             // 로그를 기록하거나 예외를 처리
@@ -145,7 +146,7 @@ public class WeatherService {
         }
     }
 
-    private String determineSeasin(LocalDate date) {
+    private String determineSeason(LocalDate date) {
         int month = date.getMonthValue();
         if (month >=3 && month <= 5) {
             return "봄";
