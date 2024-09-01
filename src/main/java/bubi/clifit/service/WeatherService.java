@@ -144,4 +144,17 @@ public class WeatherService {
                 return "정보 없음";
         }
     }
+
+    private String determineSeasin(LocalDate date) {
+        int month = date.getMonthValue();
+        if (month >=3 && month <= 5) {
+            return "봄";
+        } else if (month >= 6 && month <= 8) {
+            return "여름";
+        } else if (month >= 9 && month <= 11) {
+            return "가을";
+        } else {
+            return "겨울";
+        }
+    }
 }

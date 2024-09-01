@@ -17,12 +17,19 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
-    public Image saveImage(MultipartFile file) throws IOException {
+    public Image saveImage(MultipartFile file, String category, String type, String season,
+                           String weather, double minTemperature, double maxTemperature) throws IOException {
         Image image = new Image();
-        image.setName(file.getOriginalFilename());
-        image.setType(file.getContentType());
+        image.setCategory(category);
+        image.setType(type);
+        image.setSeason(season);
+        image.setWeather(weather);
+        image.setMinTemperature(minTemperature);
+        image.setMaxTemperature(maxTemperature);
         image.setData(file.getBytes());
 
+        //이미지 관련 정보 설정
+        image.setData(file.getBytes());
         return imageRepository.save(image);
     }
 

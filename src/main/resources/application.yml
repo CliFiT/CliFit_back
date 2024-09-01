@@ -34,3 +34,7 @@ weather:
   api:
     url: ${WEATHER_URL}
     authKey: ${AUTH_KEY}
+
+openai:
+  api:
+    key: ${AI_KEY}

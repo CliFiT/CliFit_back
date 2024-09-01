@@ -23,12 +23,18 @@ public class ImageController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestPart("image") MultipartFile file) {
+    public ResponseEntity<String> upload(@RequestParam("image") MultipartFile file,
+                                        @RequestParam("category") String category,
+                                        @RequestParam("type") String type,
+                                        @RequestParam("season") String season,
+                                        @RequestParam("weather") String weather,
+                                        @RequestParam("minTemperature") double minTemperature,
+                                        @RequestParam("maxTemperature") double maxTemperature) {
         try {
-            Image image = imageService.saveImage(file);
-            return ResponseEntity.ok("이미지 업로드 성공!: " + image.getId());
+            Image savedImage = imageService.saveImage(file, category, type, season, weather, minTemperature, maxTemperature);
+            return ResponseEntity.ok("이미지 업로드 성공!:" + savedImage.getId());
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업로드 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업로드 실패!: "+e.getMessage());
         }
     }
 
@@ -38,11 +44,9 @@ public class ImageController {
 
         if (imageOptional.isPresent()) {
             Image image = imageOptional.get();
-            String contentType = image.getType(); // 이미지 MIME 타입 (예: image/jpeg)
-            String fileName = image.getName(); // 이미지 파일명 (예: image.jpg)
+            String fileName = "image_" + id;
 
             return ResponseEntity.ok()
-                    .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
                     .body(image.getData());
         } else {
