@@ -25,7 +25,7 @@ public class OpenAiService {
 
         // 요청 본문 생성 (JSON 형식)
         String requestBody = String.format(
-                "{\"model\": \"gpt-4\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}], \"max_tokens\": 150}",
+                "{\"model\": \"gpt-4\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}], \"max_tokens\": 160}",
                 prompt
         );
 

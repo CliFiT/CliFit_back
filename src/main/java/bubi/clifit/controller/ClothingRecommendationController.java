@@ -17,7 +17,7 @@ public class ClothingRecommendationController {
     private ClothingRecommendationService recommendationService;
 
     @GetMapping("/recommend")
-    public List<Image> getRecommendations() {
+    public String getRecommendations() {
         return recommendationService.recommendClothing();
     }
 }

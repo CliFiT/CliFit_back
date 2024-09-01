@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ClothingRecommendationService {
@@ -24,29 +25,40 @@ public class ClothingRecommendationService {
     @Autowired
     private ImageRepository imageRepository;
 
-    public List<Image> recommendClothing() {
+    public String recommendClothing() {
         // 날씨 정보 가져오기
         WeatherResponse weatherInfo = weatherService.getWeather();
-        String prompt = generatePrompt(weatherInfo);
+
+        // DB에서 모든 옷 정보 가져오기
+        List<Image> allImages = imageRepository.findAll();
+
+        // 프롬프트 생성
+        String prompt = generatePrompt(weatherInfo, allImages);
 
         // OpenAI API로 추천 결과 받기
         String aiResponse = openAiService.getRecommendation(prompt);
         System.out.println("AI Response: " + aiResponse);
 
         // 추천된 옷 카테고리별 필터링
-        List<Image> recommendations = parseAiResponse(aiResponse, weatherInfo);
+        String recommendations = parseAiResponse(aiResponse, allImages);
         System.out.println("Recommendations: " + recommendations);
 
         return recommendations;
     }
 
-    private String generatePrompt(WeatherResponse weatherInfo) {
-        return String.format("%s도 %s 날씨를 기준으로 계절 %s에 맞는 코디 추천",
-                weatherInfo.getTemperature(), weatherInfo.getWeatherCondition(), weatherInfo.getSeason());
+    private String generatePrompt(WeatherResponse weatherInfo, List<Image> allImages) {
+        // DB에서 가져온 옷 정보를 프롬프트에 포함시키기
+        String clothingOptions = allImages.stream()
+                .map(Image::getType) // 옷의 타입을 가져와서
+                .distinct() // 중복 제거
+                .collect(Collectors.joining(", ")); // 콤마로 구분된 문자열 생성
+
+        return String.format("다음의 옷들 중에서 %s도 %s 날씨를 기준으로 계절 %s에 맞는 코디를 추천해 주세요: %s 공백 포함 160자 이내로 완전한 문장으로 맺어줘",
+                weatherInfo.getTemperature(), weatherInfo.getWeatherCondition(), weatherInfo.getSeason(), clothingOptions);
     }
 
-    private List<Image> parseAiResponse(String aiResponse, WeatherResponse weatherInfo) {
-        List<Image> additionalRecommendations = new ArrayList<>();
+    private String parseAiResponse(String aiResponse, List<Image> allImages) {
+        String additionalRecommendations = new String();
 
         if (aiResponse != null && !aiResponse.isEmpty()) {
             try {
@@ -57,16 +69,19 @@ public class ClothingRecommendationService {
                 String[] items = content.split("\n");
                 System.out.println("Extracted Items: " + Arrays.toString(items));
 
-                for (String item : items) {
-                    item = item.trim().replaceAll("[^a-zA-Z0-9가-힣\\s]", ""); // 특수 문자 제거
-                    System.out.println("Searching for item: " + item);
-                    Image image = imageRepository.findByTypeAndWeatherAndSeason(item, weatherInfo.getWeatherCondition(), weatherInfo.getSeason());
-                    if (image != null) {
-                        additionalRecommendations.add(image);
-                    } else {
-                        System.out.println("No image found for item: " + item);
-                    }
+                // DB에서 가져온 옷들 중에서 추천된 옷만 필터링
+                List<String> itemTypes = Arrays.stream(items)
+                        .map(String::trim)
+                        .map(item -> item.replaceAll("[^a-zA-Z0-9가-힣\\s]", "")) // 특수 문자 제거
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                additionalRecommendations = content;
+
+                if (additionalRecommendations.isEmpty()) {
+                    System.out.println("No matching images found.");
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("Failed to parse AI response", e);
@@ -94,11 +109,5 @@ public class ClothingRecommendationService {
             e.printStackTrace();
         }
         return "";
-    }
-
-    private String[] extractRecommendations(String content) {
-        // 추천 항목 추출 로직 수정
-        String cleanedContent = content.replaceAll("\\d+\\.", "").trim(); // 항목 번호 제거
-        return cleanedContent.split("\n"); // 줄바꿈으로 구분된 항목
     }
 }
