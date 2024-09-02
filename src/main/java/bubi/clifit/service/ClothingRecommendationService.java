@@ -49,11 +49,11 @@ public class ClothingRecommendationService {
     private String generatePrompt(WeatherResponse weatherInfo, List<Image> allImages) {
         // DB에서 가져온 옷 정보를 프롬프트에 포함시키기
         String clothingOptions = allImages.stream()
-                .map(Image::getType) // 옷의 타입을 가져와서
+                .map(image -> image.getType() + image.getColor()) // 옷의 타입을 가져와서
                 .distinct() // 중복 제거
                 .collect(Collectors.joining(", ")); // 콤마로 구분된 문자열 생성
 
-        return String.format("다음의 옷들 중에서 %s도 %s 날씨를 기준으로 계절 %s에 맞는 코디를 추천해 주세요: %s 공백 포함 160자 이내로 완전한 문장으로 맺어줘",
+        return String.format("다음의 옷들 중에서 %s도 %s 날씨를 기준으로 계절 %s에 맞는 코디를 추천해 주세요: %s 공백 포함 160자 이내 최대 2문장으로 줘",
                 weatherInfo.getTemperature(), weatherInfo.getWeatherCondition(), weatherInfo.getSeason(), clothingOptions);
     }
 

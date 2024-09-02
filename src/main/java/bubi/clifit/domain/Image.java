@@ -20,6 +20,7 @@ public class Image {
     private String type;
     private String season;
     private String weather;
+    private String color;
     private double minTemperature;
     private double maxTemperature;
 

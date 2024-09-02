@@ -18,12 +18,13 @@ public class ImageService {
     }
 
     public Image saveImage(MultipartFile file, String category, String type, String season,
-                           String weather, double minTemperature, double maxTemperature) throws IOException {
+                           String weather,String color , double minTemperature, double maxTemperature) throws IOException {
         Image image = new Image();
         image.setCategory(category);
         image.setType(type);
         image.setSeason(season);
         image.setWeather(weather);
+        image.setColor(color);
         image.setMinTemperature(minTemperature);
         image.setMaxTemperature(maxTemperature);
         image.setContentType(file.getContentType());

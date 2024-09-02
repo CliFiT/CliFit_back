@@ -28,10 +28,11 @@ public class ImageController {
                                         @RequestParam("type") String type,
                                         @RequestParam("season") String season,
                                         @RequestParam("weather") String weather,
+                                        @RequestParam("color") String color,
                                         @RequestParam("minTemperature") double minTemperature,
                                         @RequestParam("maxTemperature") double maxTemperature) {
         try {
-            Image savedImage = imageService.saveImage(file, category, type, season, weather, minTemperature, maxTemperature);
+            Image savedImage = imageService.saveImage(file, category, type, season, weather, color, minTemperature, maxTemperature);
             return ResponseEntity.ok("이미지 업로드 성공!:" + savedImage.getId());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업로드 실패!: "+e.getMessage());
